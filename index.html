@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Knot Randomizer">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>Knot Randomizer</title>
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg:#0b1220; --card:#111827; --card2:#172033; --text:#f8fafc;
+      --muted:#94a3b8; --accent:#f59e0b; --accent2:#fbbf24; --line:#263247;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100dvh; background:linear-gradient(180deg,#08101d,#101827);
+      color:var(--text); display:flex; justify-content:center; padding:
+      max(24px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom));
+    }
+    main { width:min(100%,520px); display:flex; flex-direction:column; gap:16px; }
+    .title { text-align:center; margin-top:8px; }
+    h1 { font-size:28px; margin:0 0 5px; letter-spacing:-.6px; }
+    .subtitle { color:var(--muted); font-size:14px; }
+    .card {
+      background:rgba(17,24,39,.94); border:1px solid var(--line);
+      border-radius:22px; padding:24px 20px; box-shadow:0 18px 45px rgba(0,0,0,.28);
+    }
+    .eyebrow {
+      text-transform:uppercase; letter-spacing:.13em; font-weight:700;
+      color:var(--muted); font-size:12px; text-align:center;
+    }
+    #knot {
+      min-height:88px; display:flex; align-items:center; justify-content:center;
+      text-align:center; font-size:30px; line-height:1.1; font-weight:800;
+      margin:12px 0 18px; text-wrap:balance;
+    }
+    button, a.action {
+      width:100%; min-height:56px; border-radius:16px; border:0; font-weight:800;
+      font-size:17px; display:flex; align-items:center; justify-content:center;
+      text-decoration:none; cursor:pointer; -webkit-tap-highlight-color:transparent;
+    }
+    #pick { background:var(--accent); color:#111827; }
+    #pick:active { transform:scale(.985); background:var(--accent2); }
+    a.action { margin-top:12px; background:var(--card2); color:var(--text); border:1px solid var(--line); }
+    a.action.disabled { opacity:.42; pointer-events:none; }
+    .row {
+      margin-top:18px; display:flex; align-items:center; justify-content:space-between;
+      gap:12px; border-top:1px solid var(--line); padding-top:16px;
+    }
+    .toggle { display:flex; align-items:center; gap:9px; color:#e2e8f0; font-size:14px; }
+    input[type=checkbox] { width:20px; height:20px; accent-color:var(--accent); }
+    #remaining { font-size:13px; color:var(--muted); white-space:nowrap; }
+    #reset {
+      background:transparent; color:var(--muted); min-height:auto; width:auto;
+      padding:10px 2px; font-size:14px; margin:4px auto 0;
+    }
+    .foot { text-align:center; color:var(--muted); font-size:12px; line-height:1.45; padding:0 12px; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="title">
+    <h1>🪢 Knot Randomizer</h1>
+    <div class="subtitle">Tap the button. Tie the knot.</div>
+  </div>
+
+  <section class="card">
+    <div class="eyebrow">Selected Knot</div>
+    <div id="knot">Ready?</div>
+
+    <button id="pick">🎲 Pick a Knot</button>
+    <a id="learn" class="action disabled" href="#" target="_blank" rel="noopener">
+      View How to Tie It ↗
+    </a>
+
+    <div class="row">
+      <label class="toggle">
+        <input id="noRepeat" type="checkbox" checked>
+        No repeats
+      </label>
+      <span id="remaining">13 of 13 remaining</span>
+    </div>
+    <button id="reset">Reset session</button>
+  </section>
+
+  <div class="foot">
+    Randomizer works offline once installed as a web app. The Animated Knots link requires internet access.
+  </div>
+</main>
+
+<script>
+const knots = [{"name": "Figure 8", "url": "https://www.animatedknots.com/figure-8-knot"}, {"name": "Figure 8 on-a-bight", "url": "https://www.animatedknots.com/figure-8-follow-through-loop-knot"}, {"name": "Figure 8 follow-through", "url": "https://www.animatedknots.com/figure-8-follow-through-loop-knot"}, {"name": "Münter Hitch", "url": "https://www.animatedknots.com/munter-mule-combination-hitch-knot"}, {"name": "Super Münter Hitch", "url": "https://www.animatedknots.com/super-munter-hitch-knot"}, {"name": "Münter Mule Overhand", "url": "https://www.animatedknots.com/munter-mule-combination-hitch-knot"}, {"name": "Alpine Butterfly", "url": "https://www.animatedknots.com/alpine-butterfly-loop-knot"}, {"name": "Water Knot", "url": "https://www.animatedknots.com/water-knot"}, {"name": "Hasty Harness / Swiss Seat", "url": "https://www.animatedknots.com/search-rescue-knots"}, {"name": "Double Fisherman", "url": "https://www.animatedknots.com/double-fishermans-bend-knot"}, {"name": "Prusik Hitch", "url": "https://www.animatedknots.com/hitch-knots"}, {"name": "Clove Hitch", "url": "https://www.animatedknots.com/hitch-knots"}, {"name": "Girth Hitch", "url": "https://www.animatedknots.com/search-rescue-knots"}];
+const knotEl = document.getElementById('knot');
+const learnEl = document.getElementById('learn');
+const noRepeatEl = document.getElementById('noRepeat');
+const remainingEl = document.getElementById('remaining');
+let available = knots.map((_, i) => i);
+let lastIndex = null;
+
+function updateRemaining() {
+  if (noRepeatEl.checked) {
+    remainingEl.textContent = `${available.length} of ${knots.length} remaining`;
+  } else {
+    remainingEl.textContent = `${knots.length} knots`;
+  }
+}
+
+function reset() {
+  available = knots.map((_, i) => i);
+  lastIndex = null;
+  knotEl.textContent = 'Ready?';
+  learnEl.href = '#';
+  learnEl.classList.add('disabled');
+  updateRemaining();
+}
+
+function pick() {
+  if (noRepeatEl.checked) {
+    if (available.length === 0) available = knots.map((_, i) => i);
+    const pos = Math.floor(Math.random() * available.length);
+    lastIndex = available.splice(pos, 1)[0];
+  } else {
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * knots.length);
+    } while (knots.length > 1 && idx === lastIndex);
+    lastIndex = idx;
+  }
+  const selected = knots[lastIndex];
+  knotEl.textContent = selected.name;
+  learnEl.href = selected.url;
+  learnEl.classList.remove('disabled');
+  updateRemaining();
+
+  if (navigator.vibrate) navigator.vibrate(20);
+}
+
+document.getElementById('pick').addEventListener('click', pick);
+document.getElementById('reset').addEventListener('click', reset);
+noRepeatEl.addEventListener('change', () => {
+  if (noRepeatEl.checked && available.length === 0) available = knots.map((_, i) => i);
+  updateRemaining();
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+updateRemaining();
+</script>
+</body>
+</html>
